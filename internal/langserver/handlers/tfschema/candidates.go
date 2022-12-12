@@ -60,7 +60,7 @@ func valueCandidates(values []string, r lsp.Range, isOrdered bool) []lsp.Complet
 	return candidates
 }
 
-func resourceTypeCandidates(prefix *string, r lsp.Range) []lsp.CompletionItem {
+func ResourceTypeCandidates(prefix *string, r lsp.Range) []lsp.CompletionItem {
 	return typeCandidates(prefix, r, false)
 }
 

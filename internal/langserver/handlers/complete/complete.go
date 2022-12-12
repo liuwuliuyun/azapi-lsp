@@ -2,28 +2,46 @@ package complete
 
 import (
 	"fmt"
-	"log"
-	"strings"
-
 	"github.com/Azure/azapi-lsp/internal/langserver/handlers/tfschema"
 	ilsp "github.com/Azure/azapi-lsp/internal/lsp"
 	"github.com/Azure/azapi-lsp/internal/parser"
 	lsp "github.com/Azure/azapi-lsp/internal/protocol"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"log"
 )
 
 func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logger) []lsp.CompletionItem {
 	file, _ := hclsyntax.ParseConfig(data, filename, hcl.InitialPos)
 
 	body, isHcl := file.Body.(*hclsyntax.Body)
+	if pos.Column != 0 {
+		return nil
+	}
 	if !isHcl {
 		logger.Printf("file is not hcl")
 		return nil
 	}
-	block := parser.BlockAtPos(body, pos)
+	block := parser.LastBlock(body, pos)
 	candidateList := make([]lsp.CompletionItem, 0)
-	if block != nil && len(block.Labels) != 0 && strings.HasPrefix(block.Labels[0], "azapi") {
+	if block != nil && len(block.Labels) != 0 {
+		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
+		resource := tfschema.GetResourceSchema(resourceName)
+
+		predictionResourceList := reco.getNextPossibleResources(resource)
+
+		editRange := lsp.Range{
+			Start: ilsp.HCLPosToLSP(pos),
+			End:   ilsp.HCLPosToLSP(pos),
+		}
+
+		for _, predResource := range predictionResourceList {
+			candidateList = append(candidateList, tfschema.ResourceTypeCandidates(predResource, editRange)...)
+		}
+
+	}
+
+	if block != nil && len(block.Labels) != 0 {
 		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
 		resource := tfschema.GetResourceSchema(resourceName)
 		if resource == nil {

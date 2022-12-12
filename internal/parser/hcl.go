@@ -39,6 +39,20 @@ func BlockAtPos(body *hclsyntax.Body, pos hcl.Pos) *hclsyntax.Block {
 	return nil
 }
 
+func LastBlock(body *hclsyntax.Body, pos hcl.Pos) *hclsyntax.Block {
+	if len(body.Blocks) < 1 {
+		return nil
+	}
+	lastBlock := body.Blocks[0]
+	for _, b := range body.Blocks {
+		if BlockAfterPos(b.Range(), pos) {
+			return lastBlock
+		}
+		lastBlock = b
+	}
+	return lastBlock
+}
+
 func AttributeAtPos(block *hclsyntax.Block, pos hcl.Pos) *hclsyntax.Attribute {
 	if block == nil {
 		return nil

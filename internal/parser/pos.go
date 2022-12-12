@@ -7,3 +7,7 @@ func ContainsPos(r hcl.Range, pos hcl.Pos) bool {
 	beforeEnd := pos.Line < r.End.Line || pos.Line == r.End.Line && pos.Column <= r.End.Column
 	return afterStart && beforeEnd
 }
+
+func BlockAfterPos(r hcl.Range, pos hcl.Pos) bool {
+	return pos.Line < r.Start.Line
+}
