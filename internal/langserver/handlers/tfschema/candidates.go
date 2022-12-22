@@ -9,6 +9,30 @@ import (
 	lsp "github.com/Azure/azapi-lsp/internal/protocol"
 )
 
+func RecommendedResources(resouces []string, r lsp.Range) []lsp.CompletionItem {
+	candidates := make([]lsp.CompletionItem, 0)
+	for index, resource := range resouces {
+		candidates = append(candidates, lsp.CompletionItem{
+			Label:  resource,
+			Kind:   lsp.ValueCompletion,
+			Detail: fmt.Sprintf("resource \"%s\" {\n}\n", resource),
+			Documentation: lsp.MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("Type: `%s`\n", resource),
+			},
+			SortText:         fmt.Sprintf("%04d", index),
+			InsertTextFormat: lsp.SnippetTextFormat,
+			InsertTextMode:   lsp.AdjustIndentation,
+			TextEdit: &lsp.TextEdit{
+				Range:   r,
+				NewText: fmt.Sprintf("resource \"%s\" {\n}\n", resource),
+			},
+			Command: constTriggerSuggestCommand(),
+		})
+	}
+	return candidates
+}
+
 func PropertiesCandidates(props []Property, r lsp.Range) []lsp.CompletionItem {
 	candidates := make([]lsp.CompletionItem, 0)
 	for index, prop := range props {

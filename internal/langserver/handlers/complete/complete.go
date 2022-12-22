@@ -15,7 +15,7 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 	file, _ := hclsyntax.ParseConfig(data, filename, hcl.InitialPos)
 
 	body, isHcl := file.Body.(*hclsyntax.Body)
-	if pos.Column != 0 {
+	if pos.Column != 1 {
 		return nil
 	}
 	if !isHcl {
@@ -28,60 +28,17 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
 		resource := tfschema.GetResourceSchema(resourceName)
 
-		predictionResourceList := reco.getNextPossibleResources(resource)
+		predictionResourceList := getNextPossibleResources(resource)
 
 		editRange := lsp.Range{
 			Start: ilsp.HCLPosToLSP(pos),
 			End:   ilsp.HCLPosToLSP(pos),
 		}
 
-		for _, predResource := range predictionResourceList {
-			candidateList = append(candidateList, tfschema.ResourceTypeCandidates(predResource, editRange)...)
-		}
+		candidateList = append(candidateList, tfschema.RecommendedResources(predictionResourceList, editRange)...)
 
 	}
 
-	if block != nil && len(block.Labels) != 0 {
-		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
-		resource := tfschema.GetResourceSchema(resourceName)
-		if resource == nil {
-			return candidateList
-		}
-		if attribute := parser.AttributeAtPos(block, pos); attribute != nil {
-			property := resource.GetProperty(attribute.Name)
-			if property != nil {
-				if property.GenericCandidatesFunc != nil {
-					candidateList = append(candidateList, property.GenericCandidatesFunc(data, filename, block, attribute, pos, property)...)
-				} else if property.ValueCandidatesFunc != nil {
-					prefix := parser.ToLiteral(attribute.Expr)
-					candidateList = append(candidateList, property.ValueCandidatesFunc(prefix, editRangeFromExprRange(attribute.Expr, pos))...)
-				}
-			}
-		} else {
-			if subBody := parser.BlockAtPos(block.Body, pos); subBody != nil {
-				property := resource.GetProperty(subBody.Type)
-				if property == nil {
-					return nil
-				}
-				if attribute := parser.AttributeAtPos(subBody, pos); attribute != nil {
-					for _, p := range property.NestedProperties {
-						if p.Name == attribute.Name && p.ValueCandidatesFunc != nil {
-							candidateList = append(candidateList, p.ValueCandidatesFunc(nil, editRangeFromExprRange(attribute.Expr, pos))...)
-							break
-						}
-					}
-				}
-			} else {
-				//input a top level property
-				editRange := lsp.Range{
-					Start: ilsp.HCLPosToLSP(pos),
-					End:   ilsp.HCLPosToLSP(pos),
-				}
-				editRange.Start.Character = 2
-				candidateList = append(candidateList, tfschema.PropertiesCandidates(resource.Properties, editRange)...)
-			}
-		}
-	}
 	return candidateList
 }
 
@@ -91,4 +48,11 @@ func editRangeFromExprRange(expression hclsyntax.Expression, pos hcl.Pos) lsp.Ra
 		expRange.End = pos
 	}
 	return ilsp.HCLRangeToLSP(expRange)
+}
+
+func getNextPossibleResources(resource *tfschema.Resource) []string {
+	sample1 := "azurerm_storage_account"
+	sample2 := "azurerm_network_interface"
+	sample3 := "azurerm_virtual_network"
+	return []string{sample1, sample2, sample3}
 }
