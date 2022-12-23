@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"github.com/Azure/azapi-lsp/internal/langserver/handlers/prediction"
 
 	"github.com/Azure/azapi-lsp/internal/azure"
 	lsctx "github.com/Azure/azapi-lsp/internal/context"
@@ -93,5 +94,11 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 
 	// initialize embedded azurerm schema
 	azure.GetAzureSchema()
+
+	// initialize prediction item
+	err = prediction.InitializePrediction()
+	if err != nil {
+		return lsp.InitializeResult{}, err
+	}
 	return serverCaps, nil
 }

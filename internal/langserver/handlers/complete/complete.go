@@ -2,6 +2,7 @@ package complete
 
 import (
 	"fmt"
+	"github.com/Azure/azapi-lsp/internal/langserver/handlers/prediction"
 	"github.com/Azure/azapi-lsp/internal/langserver/handlers/tfschema"
 	ilsp "github.com/Azure/azapi-lsp/internal/lsp"
 	"github.com/Azure/azapi-lsp/internal/parser"
@@ -26,9 +27,12 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 	candidateList := make([]lsp.CompletionItem, 0)
 	if block != nil && len(block.Labels) != 0 {
 		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
-		resource := tfschema.GetResourceSchema(resourceName)
 
-		predictionResourceList := getNextPossibleResources(resource)
+		predictionResourceList, err := prediction.Pred.Top3PredResult(resourceName)
+		if err != nil {
+			logger.Print(err)
+			return nil
+		}
 
 		editRange := lsp.Range{
 			Start: ilsp.HCLPosToLSP(pos),
@@ -36,7 +40,6 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 		}
 
 		candidateList = append(candidateList, tfschema.RecommendedResources(predictionResourceList, editRange)...)
-
 	}
 
 	return candidateList
@@ -48,11 +51,4 @@ func editRangeFromExprRange(expression hclsyntax.Expression, pos hcl.Pos) lsp.Ra
 		expRange.End = pos
 	}
 	return ilsp.HCLRangeToLSP(expRange)
-}
-
-func getNextPossibleResources(resource *tfschema.Resource) []string {
-	sample1 := "azurerm_storage_account"
-	sample2 := "azurerm_network_interface"
-	sample3 := "azurerm_virtual_network"
-	return []string{sample1, sample2, sample3}
 }

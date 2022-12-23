@@ -10,8 +10,10 @@ type Prediction struct {
 	internalMapping map[string]any
 }
 
+var Pred *Prediction
+
 func (p Prediction) loadJsonPrediction() error {
-	config, err := os.ReadFile(fmt.Sprintf("./prediction/pred.json"))
+	config, err := os.ReadFile(fmt.Sprintf("./prediction/processed.json"))
 	if err != nil {
 		return err
 	}
@@ -31,15 +33,17 @@ func (p Prediction) Top3PredResult(parentResource string) ([]string, error) {
 		}
 	}
 	if value, ok := p.internalMapping[parentResource]; ok {
-		mapping := value.(map[string]string)
-
-		i := 0
-		keys := make([]string, len(mapping))
-		for key := range mapping {
-			keys[i] = key
-			i++
-		}
-		return keys, nil
+		return value.([]string), nil
 	}
-	return nil, fmt.Errorf("error finding predicted resources")
+	return make([]string, 0), nil
+}
+
+func InitializePrediction() error {
+	if Pred == nil {
+		err := Pred.loadJsonPrediction()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
