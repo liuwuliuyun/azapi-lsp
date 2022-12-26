@@ -26,17 +26,20 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 	block := parser.LastBlock(body, pos)
 	candidateList := make([]lsp.CompletionItem, 0)
 	if block != nil && len(block.Labels) != 0 {
-		resourceName := fmt.Sprintf("%s.%s", block.Type, block.Labels[0])
+		resourceName := fmt.Sprintf("%s", block.Labels[0])
 
-		predictionResourceList, err := prediction.Pred.Top3PredResult(resourceName)
+		predictionResourceList, err := prediction.InternalPred.Top3PredResult(resourceName)
 		if err != nil {
 			logger.Print(err)
 			return nil
 		}
 
+		endPos := pos
+		endPos.Line += 1
+
 		editRange := lsp.Range{
 			Start: ilsp.HCLPosToLSP(pos),
-			End:   ilsp.HCLPosToLSP(pos),
+			End:   ilsp.HCLPosToLSP(endPos),
 		}
 
 		candidateList = append(candidateList, tfschema.RecommendedResources(predictionResourceList, editRange)...)

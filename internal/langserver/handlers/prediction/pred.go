@@ -7,18 +7,22 @@ import (
 )
 
 type Prediction struct {
-	internalMapping map[string]any
+	internalMapping map[string][]string
 }
 
-var Pred *Prediction
+var InternalPred *Prediction
 
-func (p Prediction) loadJsonPrediction() error {
-	config, err := os.ReadFile(fmt.Sprintf("./prediction/processed.json"))
+func LoadJsonPrediction(filePath string, predictionItem *Prediction) error {
+	defaultFilePath := "./prediction/processed.json"
+	if len(filePath) > 0 {
+		defaultFilePath = filePath
+	}
+	config, err := os.ReadFile(fmt.Sprintf(defaultFilePath))
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(config, &p.internalMapping)
+	err = json.Unmarshal(config, &predictionItem.internalMapping)
 	if err != nil {
 		return err
 	}
@@ -26,21 +30,18 @@ func (p Prediction) loadJsonPrediction() error {
 }
 
 func (p Prediction) Top3PredResult(parentResource string) ([]string, error) {
-	if p.internalMapping == nil {
-		err := p.loadJsonPrediction()
-		if err != nil {
-			return nil, err
-		}
-	}
 	if value, ok := p.internalMapping[parentResource]; ok {
-		return value.([]string), nil
+		return value, nil
 	}
 	return make([]string, 0), nil
 }
 
 func InitializePrediction() error {
-	if Pred == nil {
-		err := Pred.loadJsonPrediction()
+	if InternalPred == nil {
+		InternalPred = &Prediction{
+			internalMapping: map[string][]string{},
+		}
+		err := LoadJsonPrediction("", InternalPred)
 		if err != nil {
 			return err
 		}

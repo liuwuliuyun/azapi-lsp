@@ -5,29 +5,29 @@
     "isIncomplete": false,
     "items": [
       {
-        "label": "keyType",
+        "label": "azurerm_storage_account",
         "labelDetails": {},
-        "kind": 10,
-        "detail": "keyType (Required)",
+        "kind": 12,
+        "detail": "resource \"azurerm_storage_account\" {\n}\n",
         "documentation": {
           "kind": "markdown",
-          "value": "Type: `string`  \nType of the test key\n"
+          "value": "Type: `azurerm_storage_account`\n"
         },
-        "sortText": "0keyType",
+        "sortText": "0000",
         "insertTextFormat": 2,
         "insertTextMode": 2,
         "textEdit": {
           "range": {
             "start": {
               "line": 4,
-              "character": 4
+              "character": 0
             },
             "end": {
-              "line": 4,
-              "character": 4
+              "line": 5,
+              "character": 0
             }
           },
-          "newText": "keyType = \"$0\""
+          "newText": "resource \"azurerm_storage_account\" {\n}\n"
         },
         "command": {
           "title": "Suggest",
@@ -35,29 +35,59 @@
         }
       },
       {
-        "label": "required-properties",
+        "label": "azurerm_virtual_network",
         "labelDetails": {},
-        "kind": 15,
-        "detail": "Required properties",
+        "kind": 12,
+        "detail": "resource \"azurerm_virtual_network\" {\n}\n",
         "documentation": {
           "kind": "markdown",
-          "value": "Type: ``  \n```\nkeyType = \"$1\"\n\n```\n"
+          "value": "Type: `azurerm_virtual_network`\n"
         },
-        "sortText": "0",
+        "sortText": "0001",
         "insertTextFormat": 2,
         "insertTextMode": 2,
         "textEdit": {
           "range": {
             "start": {
               "line": 4,
-              "character": 4
+              "character": 0
             },
             "end": {
-              "line": 4,
-              "character": 4
+              "line": 5,
+              "character": 0
             }
           },
-          "newText": "keyType = \"$1\"\n"
+          "newText": "resource \"azurerm_virtual_network\" {\n}\n"
+        },
+        "command": {
+          "title": "Suggest",
+          "command": "editor.action.triggerSuggest"
+        }
+      },
+      {
+        "label": "azurerm_data_factory",
+        "labelDetails": {},
+        "kind": 12,
+        "detail": "resource \"azurerm_data_factory\" {\n}\n",
+        "documentation": {
+          "kind": "markdown",
+          "value": "Type: `azurerm_data_factory`\n"
+        },
+        "sortText": "0002",
+        "insertTextFormat": 2,
+        "insertTextMode": 2,
+        "textEdit": {
+          "range": {
+            "start": {
+              "line": 4,
+              "character": 0
+            },
+            "end": {
+              "line": 5,
+              "character": 0
+            }
+          },
+          "newText": "resource \"azurerm_data_factory\" {\n}\n"
         },
         "command": {
           "title": "Suggest",

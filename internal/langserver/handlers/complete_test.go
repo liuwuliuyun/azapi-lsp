@@ -230,7 +230,7 @@ func TestCompletion_newLineTest(t *testing.T) {
 
 	ls.CallAndExpectResponse(t, &langserver.CallRequest{
 		Method:    "textDocument/completion",
-		ReqParams: buildReqParamsCompletion(8, 1, tmpDir.URI()),
+		ReqParams: buildReqParamsCompletion(5, 1, tmpDir.URI()),
 	}, string(expectRaw))
 }
 
