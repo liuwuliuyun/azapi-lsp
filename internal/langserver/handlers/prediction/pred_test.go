@@ -6,11 +6,7 @@ import (
 )
 
 func TestPrediction_Top3PredResult(t *testing.T) {
-
-	InternalPred = &Prediction{
-		internalMapping: map[string][]string{},
-	}
-	err := LoadJsonPrediction("./processed.json", InternalPred)
+	err := InitializePrediction()
 	if err != nil {
 		t.Fatal(err)
 	}
