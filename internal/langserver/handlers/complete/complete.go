@@ -34,12 +34,9 @@ func CandidatesAtPos(data []byte, filename string, pos hcl.Pos, logger *log.Logg
 			return nil
 		}
 
-		endPos := pos
-		endPos.Line += 1
-
 		editRange := lsp.Range{
 			Start: ilsp.HCLPosToLSP(pos),
-			End:   ilsp.HCLPosToLSP(endPos),
+			End:   ilsp.HCLPosToLSP(pos),
 		}
 
 		candidateList = append(candidateList, tfschema.RecommendedResources(predictionResourceList, editRange)...)

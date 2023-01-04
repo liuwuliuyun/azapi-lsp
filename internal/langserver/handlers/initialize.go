@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/Azure/azapi-lsp/internal/langserver/handlers/prediction"
 
-	"github.com/Azure/azapi-lsp/internal/azure"
 	lsctx "github.com/Azure/azapi-lsp/internal/context"
 	ilsp "github.com/Azure/azapi-lsp/internal/lsp"
 	lsp "github.com/Azure/azapi-lsp/internal/protocol"
@@ -93,7 +92,7 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 	}
 
 	// initialize embedded azurerm schema
-	azure.GetAzureSchema()
+	// azure.GetAzureSchema()
 
 	// initialize prediction item
 	err = prediction.InitializePrediction()
